@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.2.3/css/bootstrap.min.css" integrity="sha512-SbiR/eusphKoMVVXysTKG/7VseWii+Y3FdHrt0EpKgpToZeemhqHeZeLWLhJutz/2ut2Vw1uQEj2MbRF+TVBUA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+<header>
+
+     
+      
+
+</header>
+
+<body>
+<header>
+   
+</header>
+  <div class="container-fluid">
+    <style>
+         .sidebar {
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-radius: 5px;
+    height: 100%;
+  }
+
+
+    </style>
+    <div class="row">
+        <div class="col-md-3">
+            {% block sidebar %}
+            <aside class="main-sidebar sidebar-dark-primary elevation-4">
+                <div class="sidebar">
+                    {%csrf_token%}
+                    <div class=" price">
+                        <h5>Price range</h5>
+                        <div class="row">
+                            <div class="col-md-4"><input type="text" class="form-control" id="priceFrom" name="from"></div>
+                            <div class="col-1 d-flex justify-content-center">To</div>
+                            <div class="col-md-4"><input type="text" class="form-control" id="priceTo" name="To"></div>
+                            <div class="col-md-1">
+                                <button role="button" class="btn btn-success" id="price_range">Go</button>
+                            </div>
+                            
+                            
+                        </div>
+                    </div>
+                    <div class=" mt-3 category">
+                     
+                        <h5> Categories</h5>
+                             {% for cat in categories%}
+                             <div class="form-group">
+                               
+                             <input  class="form-check-input" name="category" type="checkbox" value="{{cat.id}}">
+                                <label for="cat.title">{{cat.title}}</label>
+                            </div>
+                             
+                             {% endfor%}
+                    </div>
+                    
+                    
+                    <div class=" mt-3 brand">
+                        <h5> Brands</h5>
+                             {% for brand in brands%}
+                             <div class="form-group">
+                                <input class="form-check-input" name="brand" type="checkbox" value="{{brand.title}}">
+                                <label for="brand.title">{{brand.title}}</label>
+                            </div>
+                             
+                             {% endfor%}
+                    </div>
+                    <div class=" mt-3 seller">
+                        <h5> Sellers</h5>
+                             {% for seller in sellers%}
+                             <div class="form-group">
+                                <input class="form-check-input" name="seller" type="checkbox" value="{{seller.shop_name}}">
+                                <label for="{{seller.shop_name}}">{{seller.shop_name}}</label>
+                            </div>
+
+
+                             
+                             {% endfor%}
+                    </div>
+                    <div class=" mt-3 war">
+                        <h5> Warrenties</h5>
+                             {% for war in warrenties%}
+                             <div class="form-group">
+                                <input class="form-check-input" name="warrenty" type="checkbox" value="{{war.id}}">
+                                <label for="war.title">{{war.title}}</label>
+                            </div>
+
+
+                             
+                             {% endfor%}
+                    </div>
+
+            </aside>
+            
+           
+            {% endblock %}
+
+        </div>
+        <div class="col-md-9">
+     {% block content %}
+
+
+ 
+     
+     <div class="container" >
+        <div class="row mt-3" id="ProductContainer">
+           
+                {% for product in products%}
+            <div class="col-md-3 mt-3">
+                <div class="card">
+                    <div class="card-block">
+                        <div class="container d-flex justify-content-center">
+                            <img src="/media/{{product.product_image}}" alt="none" height="150" width="150">
+    
+                        </div>
+                        
+                        <div class="row d-flex justify-content-center"> <span class="d-flex justify-content-center">{{product.price}}/-BDT</span> </div>
+                        <div class="card-title">
+                            <h6 class="d-flex justify-content-center">{{product.title}}</h6>
+                        </div>
+
+                        <div class="row container d-flex justify-content-center">
+                            
+                            <div class="col-1 container">
+                                <button role="button" class="btn  btn-danger">Buy</button>
+                            </div>
+                            <div class="col-1 container ">
+                                <button role="button" class="btn  btn-success">Cart</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+           
+    
+    
+            
+             
+            {% endfor%}
+
+
+         
+            
+    
+            
+           
+    
+        </div>
+    </div>
+  
+ 
+    <!-- default content text (typically empty) -->
+  {% endblock %}
+
+        </div>
+    </div>
+    
+   
+  </div>
+  
+  
+
+
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+  var checkboxes = document.querySelectorAll('input[type=checkbox]');
+  var csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+ 
+  
+
+  checkboxes.forEach(function(checkbox) {
+    checkbox.addEventListener('change', function() {
+        var price_from=$("#priceFrom").val()
+
+        var price_to=$("#priceTo").val()
+       console.log(price_from)
+  
+     filterProduct(csrfToken,price_from,price_to)
+ 
+    });
+  });
+
+
+  function filterProduct(csrf,from_price,to_price){
+    var categories=getSelectedValues('input[name="category"]:checked')
+    var brands=getSelectedValues('input[name="brand"]:checked')
+    var sellers=getSelectedValues('input[name="seller"]:checked')
+    var warrenties=getSelectedValues('input[name="warrenty"]:checked')
+    console.log(from_price,to_price)
+     
+    var data={
+        price_from:from_price,
+        price_to:to_price,
+        category:categories,
+        brand:brands,
+        seller:sellers,
+        warrenty:warrenties
+    }
+    
+    console.log(csrf)
+
+    axios.post("{% url 'home'%}",data,{
+        headers:{
+            'X-CSRFToken': csrf
+        }
+    }).then(function(response){
+        var data_array=response.data.data
+        console.log(data_array)
+        $("#ProductContainer").html('')
+        
+
+
+        data_array.forEach(function(item){
+            $("#ProductContainer").append(
+                `<div class="col-md-3 mt-3">
+                <div class="card">
+                    <div class="card-block">
+                        <div class="container d-flex justify-content-center">
+                            <img src="/media/${item.product_image}" alt="none" height="150" width="150">
+    
+                        </div>
+                        
+                        <div class="row d-flex justify-content-center"> <span class="d-flex justify-content-center">${item.price}/-BDT</span> </div>
+                        <div class="card-title">
+                            <h6 class="d-flex justify-content-center">${item.title}</h6>
+                        </div>
+
+                        <div class="row container">
+                            
+                            <div class="col-1 container">
+                                <button role="button" class="btn btn-sm btn-danger">Buy</button>
+                            </div>
+                            <div class="col-1 container ">
+                                <button role="button" class="btn btn-sm btn-success">Cart</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>`
+            )
+
+        })
+    })
+    
+
+  }
+
+  function getSelectedValues(selector){
+    elements=document.querySelectorAll(selector)
+    var values=[]
+    elements.forEach(function(element){
+        values.push(element.value)
+
+    })
+    return values;
+  }
+
+  $("#price_range").on('click',function(){
+    var price_from=$("#priceFrom").val()
+
+    var price_to=$("#priceTo").val()
+    filterProduct(csrfToken,price_from,price_to)
+  })
+
+
+  })
+  </script>
+ 
+
+  
+
+ <!--Scripts for this projectse -->
+ <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+ <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.4.0/axios.min.js" integrity="sha512-uMtXmF28A2Ab/JJO2t/vYhlaa/3ahUOgj1Zf27M5rOo8/+fcTUVH0/E0ll68njmjrLqOBjXM3V9NiPFL5ywWPQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+ <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.2.3/js/bootstrap.min.js" integrity="sha512-1/RvZTcCDEUjY/CypiMz+iqqtaoQfAITmNSJY17Myp4Ms5mdxPS5UV7iOfdZoxcGhzFbOm6sntTKJppjvuhg4g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+</body>
+</html>
